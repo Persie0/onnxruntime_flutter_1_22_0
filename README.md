@@ -1,11 +1,8 @@
-<!--
-This is a **fork** of the original [onnxruntime Flutter plugin](https://github.com/aztlan/flutter_onnxruntime), which appears to be no longer maintained.
-**This fork adds support for 16KB memory page size.**
--->
 
 <p align="center"><img width="50%" src="https://github.com/microsoft/onnxruntime/raw/main/docs/images/ONNX_Runtime_logo_dark.png" /></p>
 
-
+This is a **fork** of the original [onnxruntime Flutter plugin](https://github.com/aztlan/flutter_onnxruntime), which appears to be no longer maintained.
+**This fork adds support for 16KB memory page size.**
 
 # OnnxRuntime Plugin
 [![pub package](https://img.shields.io/pub/v/onnxruntime.svg)](https://pub.dev/packages/onnxruntime)
