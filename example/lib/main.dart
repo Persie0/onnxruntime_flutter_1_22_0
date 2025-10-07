@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:onnxruntime/onnxruntime.dart';
+import 'package:onnxruntime_v2/onnxruntime.dart';
 import 'model_type_test.dart';
 import 'vad_iterator.dart';
 

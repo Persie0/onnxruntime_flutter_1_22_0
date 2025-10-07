@@ -1,6 +1,6 @@
 import 'dart:ffi';
 import 'dart:io';
-import 'package:onnxruntime/src/bindings/onnxruntime_bindings_generated.dart';
+import 'package:onnxruntime_v2/src/bindings/onnxruntime_bindings_generated.dart';
 
 final DynamicLibrary _dylib = () {
   if (Platform.isAndroid) {

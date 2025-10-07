@@ -1,9 +1,9 @@
 import 'dart:ffi' as ffi;
 
 import 'package:ffi/ffi.dart';
-import 'package:onnxruntime/src/bindings/onnxruntime_bindings_generated.dart'
+import 'package:onnxruntime_v2/src/bindings/onnxruntime_bindings_generated.dart'
     as bg;
-import 'package:onnxruntime/src/ort_env.dart';
+import 'package:onnxruntime_v2/src/ort_env.dart';
 
 /// Description of the ort status.
 class OrtStatus {

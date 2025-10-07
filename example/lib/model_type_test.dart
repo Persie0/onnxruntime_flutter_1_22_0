@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
-import 'package:onnxruntime/onnxruntime.dart';
+import 'package:onnxruntime_v2/onnxruntime.dart';
 
 class ModelTypeTest {
 
