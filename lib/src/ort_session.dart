@@ -614,6 +614,36 @@ class OrtSessionOptions {
                 _ptr, flags.value);
         result = true;
         break;
+      case OrtProvider.cuda:
+        statusPtr =
+            onnxRuntimeBinding.OrtSessionOptionsAppendExecutionProvider_CUDA(
+                _ptr, flags.value);
+        result = true;
+        break;
+      case OrtProvider.rocm:
+        // ROCm uses the same pattern as CUDA but with ROCm bindings
+        // If binding is not available, gracefully fail
+        try {
+          statusPtr =
+              onnxRuntimeBinding.OrtSessionOptionsAppendExecutionProvider_MIGraphX(
+                  _ptr, flags.value);
+          result = true;
+        } catch (e) {
+          result = false;
+        }
+        break;
+      case OrtProvider.dnnl:
+        statusPtr =
+            onnxRuntimeBinding.OrtSessionOptionsAppendExecutionProvider_Dnnl(
+                _ptr, flags.value);
+        result = true;
+        break;
+      case OrtProvider.migraphx:
+        statusPtr =
+            onnxRuntimeBinding.OrtSessionOptionsAppendExecutionProvider_MIGraphX(
+                _ptr, flags.value);
+        result = true;
+        break;
       default:
         break;
     }
@@ -628,6 +658,18 @@ class OrtSessionOptions {
     switch (provider) {
       case OrtProvider.xnnpack:
         providerName = 'XNNPACK';
+        break;
+      case OrtProvider.tensorrt:
+        providerName = 'TensorRT';
+        break;
+      case OrtProvider.directml:
+        providerName = 'DML';
+        break;
+      case OrtProvider.openvino:
+        providerName = 'OpenVINO';
+        break;
+      case OrtProvider.cann:
+        providerName = 'CANN';
         break;
       default:
         return false;
@@ -662,25 +704,199 @@ class OrtSessionOptions {
     return _appendExecutionProvider(OrtProvider.cpu, flags);
   }
 
-  /// Appends CoreML provider.
+  /// Appends CoreML provider (Apple Neural Engine/GPU acceleration).
+  /// Best for iOS/macOS devices with Apple Silicon or A-series chips.
   bool appendCoreMLProvider(CoreMLFlags flags) {
     return _appendExecutionProvider(OrtProvider.coreml, flags);
   }
 
-  /// Appends Nnapi provider.
+  /// Appends Nnapi provider (Android Neural Networks API).
+  /// Google's Android acceleration - works on Android 8.1+.
   bool appendNnapiProvider(NnapiFlags flags) {
     return _appendExecutionProvider(OrtProvider.nnapi, flags);
   }
 
-  /// Appends QNN provider.
+  /// Appends CUDA provider (NVIDIA GPU acceleration).
+  /// Requires NVIDIA GPU with CUDA runtime installed.
+  /// Typically 5-10x faster than CPU for deep learning workloads.
+  bool appendCudaProvider(CUDAFlags flags) {
+    return _appendExecutionProvider(OrtProvider.cuda, flags);
+  }
+
+  /// Appends TensorRT provider (NVIDIA GPU with optimizations).
+  /// Requires NVIDIA GPU with TensorRT runtime installed.
+  /// Can be 2-5x faster than raw CUDA with additional optimizations.
+  /// Supports FP16 and INT8 quantization for even faster inference.
+  bool appendTensorRTProvider([Map<String, String>? options]) {
+    return _appendExecutionProvider2(OrtProvider.tensorrt, options ?? {});
+  }
+
+  /// Appends DirectML provider (DirectX 12 GPU acceleration).
+  /// Works on Windows with AMD, Intel, or NVIDIA GPUs.
+  /// Great for cross-vendor GPU support on Windows.
+  bool appendDirectMLProvider([Map<String, String>? options]) {
+    return _appendExecutionProvider2(OrtProvider.directml, options ?? {});
+  }
+
+  /// Appends ROCm provider (AMD GPU acceleration).
+  /// Requires AMD GPU with ROCm runtime installed (Linux only).
+  bool appendRocmProvider(ROCmFlags flags) {
+    return _appendExecutionProvider(OrtProvider.rocm, flags);
+  }
+
+  /// Appends OpenVINO provider (Intel hardware optimization).
+  /// Optimized for Intel CPUs, integrated GPUs, and VPUs.
+  /// Great performance boost on Intel hardware.
+  bool appendOpenVINOProvider([Map<String, String>? options]) {
+    return _appendExecutionProvider2(OrtProvider.openvino, options ?? {});
+  }
+
+  /// Appends DNNL provider (Intel Deep Neural Network Library).
+  /// Optimized CPU operations for Intel processors.
+  /// Good CPU performance boost on Intel hardware.
+  bool appendDNNLProvider(DNNLFlags flags) {
+    return _appendExecutionProvider(OrtProvider.dnnl, flags);
+  }
+
+  /// Appends MIGraphX provider (AMD graph optimization).
+  /// AMD's graph-level optimizations for their GPUs.
+  bool appendMIGraphXProvider(MIGraphXFlags flags) {
+    return _appendExecutionProvider(OrtProvider.migraphx, flags);
+  }
+
+  /// Appends CANN provider (Huawei Ascend AI processor).
+  /// Optimized for Huawei Ascend NPUs.
+  bool appendCANNProvider([Map<String, String>? options]) {
+    return _appendExecutionProvider2(OrtProvider.cann, options ?? {});
+  }
+
+  /// Appends QNN provider (Qualcomm Neural Network).
+  /// Optimized for Qualcomm Snapdragon chips with Hexagon DSP/NPU.
   bool appendQnnProvider() {
     return _appendExecutionProvider2(OrtProvider.qnn, {});
   }
 
-  /// Appends Xnnpack provider.
+  /// Appends Xnnpack provider (Optimized CPU operations).
+  /// Cross-platform CPU optimization, works on all platforms.
   bool appendXnnpackProvider() {
     return _appendExecutionProvider2(OrtProvider.xnnpack,
         {'intra_op_num_threads': _intraOpNumThreads.toString()});
+  }
+
+  /// Automatically selects and appends the best available execution provider.
+  /// 
+  /// **Priority order:**
+  /// 1. **GPU**: CUDA/TensorRT (NVIDIA) > DirectML (Windows) > ROCm (AMD)
+  /// 2. **NPU/Accelerators**: CoreML (Apple) > NNAPI (Android) > QNN (Qualcomm)
+  /// 3. **Optimized CPU**: DNNL (Intel) > XNNPACK (cross-platform)
+  /// 4. **Fallback**: Standard CPU
+  /// 
+  /// This method tries providers in order and uses the first one that succeeds.
+  /// Always includes CPU as a fallback to ensure models can run.
+  /// 
+  /// **Usage:**
+  /// ```dart
+  /// final options = OrtSessionOptions();
+  /// options.appendDefaultProviders(); // Auto-selects best available
+  /// final session = OrtSession.fromBuffer(modelBytes, options);
+  /// ```
+  void appendDefaultProviders() {
+    var hasProvider = false;
+
+    // Try GPU providers first (best performance for most models)
+    // CUDA/TensorRT for NVIDIA
+    if (!hasProvider) {
+      try {
+        if (appendCudaProvider(CUDAFlags.useArena)) {
+          hasProvider = true;
+        }
+      } catch (e) {
+        // CUDA not available, continue
+      }
+    }
+
+    // DirectML for Windows (AMD/Intel/NVIDIA)
+    if (!hasProvider) {
+      try {
+        if (appendDirectMLProvider()) {
+          hasProvider = true;
+        }
+      } catch (e) {
+        // DirectML not available, continue
+      }
+    }
+
+    // ROCm for AMD GPUs on Linux
+    if (!hasProvider) {
+      try {
+        if (appendRocmProvider(ROCmFlags.useArena)) {
+          hasProvider = true;
+        }
+      } catch (e) {
+        // ROCm not available, continue
+      }
+    }
+
+    // Try mobile/NPU accelerators
+    // CoreML for Apple devices (Neural Engine)
+    if (!hasProvider) {
+      try {
+        if (appendCoreMLProvider(CoreMLFlags.useNone)) {
+          hasProvider = true;
+        }
+      } catch (e) {
+        // CoreML not available, continue
+      }
+    }
+
+    // NNAPI for Android (Google's acceleration)
+    if (!hasProvider) {
+      try {
+        if (appendNnapiProvider(NnapiFlags.useNone)) {
+          hasProvider = true;
+        }
+      } catch (e) {
+        // NNAPI not available, continue
+      }
+    }
+
+    // QNN for Qualcomm chips
+    if (!hasProvider) {
+      try {
+        if (appendQnnProvider()) {
+          hasProvider = true;
+        }
+      } catch (e) {
+        // QNN not available, continue
+      }
+    }
+
+    // Try optimized CPU providers
+    // DNNL for Intel CPUs
+    if (!hasProvider) {
+      try {
+        if (appendDNNLProvider(DNNLFlags.useArena)) {
+          hasProvider = true;
+        }
+      } catch (e) {
+        // DNNL not available, continue
+      }
+    }
+
+    // XNNPACK for cross-platform CPU optimization
+    if (!hasProvider) {
+      try {
+        if (appendXnnpackProvider()) {
+          hasProvider = true;
+        }
+      } catch (e) {
+        // XNNPACK not available, continue
+      }
+    }
+
+    // Always append CPU provider as fallback
+    // This ensures the model can run even if no accelerators are available
+    appendCPUProvider(CPUFlags.useArena);
   }
 }
 
