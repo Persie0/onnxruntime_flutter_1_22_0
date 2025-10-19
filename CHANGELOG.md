@@ -1,3 +1,7 @@
+## 1.22.1
+* added support for GPU execution, results in speedups on compatible devices
+
+
 ## 1.22.0+1
 * compile sdk upgraded
 
