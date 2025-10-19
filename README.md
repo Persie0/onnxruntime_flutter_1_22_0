@@ -1,6 +1,6 @@
 <p align="center"><img width="50%" src="https://github.com/microsoft/onnxruntime/raw/main/docs/images/ONNX_Runtime_logo_dark.png" /></p>
 
-This is a **fork** of the original [onnxruntime Flutter plugin](https://github.com/aztlan/flutter_onnxruntime), which appears to be no longer maintained.
+This is a **fork** of the original [onnxruntime Flutter plugin](https://github.com/gtbluesky/onnxruntime_flutter), which appears to be no longer maintained.
 **This fork adds support for 16KB memory page size.**
 
 > **Note:** macOS is not supported on pub.dev due to their package size limit. If you need macOS support, use this package as a dependency via `git:` in your `pubspec.yaml`:
