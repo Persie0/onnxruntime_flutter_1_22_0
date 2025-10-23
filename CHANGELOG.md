@@ -1,5 +1,8 @@
-## 1.22.1
-* added support for GPU execution, results in speedups on compatible devices
+## 1.23.1
+* add libonnx 16kb compatible for x86 and x64
+
+## 1.23.0
+* full GPU and hardware acceleration support, results in speedups on compatible devices
 
 
 ## 1.22.0+1

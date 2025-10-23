@@ -31,7 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  onnxruntime:
+  onnxruntime_v2:
     # When depending on this package from a real application you should use:
     #   onnxruntime: ^x.y.z
     # See https://dart.dev/tools/pub/dependencies#version-constraints
@@ -41,8 +41,8 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
-  path_provider: 2.1.0
+  cupertino_icons: ^1.0.8
+  path_provider: ^2.1.5
 
 dev_dependencies:
   flutter_test:
@@ -53,7 +53,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  flutter_lints: ^6.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
