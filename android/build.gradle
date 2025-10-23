@@ -31,8 +31,8 @@ import de.undercouch.gradle.tasks.download.Download
 
 // Configuration for .so files
 def soFilesConfig = [
-        baseUrl: 'https://your-cdn.com/onnxruntime',  // Change this to your URL
-        version: '1.16.0',  // ONNX Runtime version
+        baseUrl: 'https://huggingface.co/csukuangfj/android-onnxruntime-libs/resolve/main',
+        version: 'v1.23.1',  // ONNX Runtime version
         architectures: ['armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'],
         libraryName: 'libonnxruntime.so'
 ]
