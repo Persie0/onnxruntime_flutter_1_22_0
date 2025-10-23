@@ -4,7 +4,7 @@ This is a **fork** of the original [onnxruntime Flutter plugin](https://github.c
 **This fork adds support for 16KB memory page size.**
 **full GPU and hardware acceleration support**
 
-> **Note:** macOS is not supported on pub.dev due to their package size limit. If you need macOS support, use this package as a dependency via `git:` in your `pubspec.yaml`:
+> **Note:** macOS and Linux is not supported on pub.dev due to their package size limit. If you need macOS support, use this package as a dependency via `git:` in your `pubspec.yaml`:
 >
 > ```yaml
 > dependencies:

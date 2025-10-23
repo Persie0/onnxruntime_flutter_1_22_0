@@ -12,6 +12,8 @@ buildscript {
     dependencies {
         // The Android Gradle Plugin knows how to build native code with the NDK.
         classpath 'com.android.tools.build:gradle:7.3.0'
+        // Add download task plugin
+        classpath 'de.undercouch:gradle-download-task:5.4.0'
     }
 }
 
@@ -23,6 +25,99 @@ rootProject.allprojects {
 }
 
 apply plugin: 'com.android.library'
+apply plugin: 'de.undercouch.download'
+
+import de.undercouch.gradle.tasks.download.Download
+
+// Configuration for .so files
+def soFilesConfig = [
+        baseUrl: 'https://your-cdn.com/onnxruntime',  // Change this to your URL
+        version: '1.16.0',  // ONNX Runtime version
+        architectures: ['armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'],
+        libraryName: 'libonnxruntime.so'
+]
+
+// Task to download .so files
+def downloadSoFiles = tasks.register('downloadSoFiles') {
+    doLast {
+        def jniLibsDir = new File(projectDir, 'src/main/jniLibs')
+        jniLibsDir.mkdirs()
+
+        soFilesConfig.architectures.each { arch ->
+            def archDir = new File(jniLibsDir, arch)
+            archDir.mkdirs()
+
+            def outputFile = new File(archDir, soFilesConfig.libraryName)
+
+            // Skip if file already exists
+            if (outputFile.exists()) {
+                println "✓ ${soFilesConfig.libraryName} for ${arch} already exists"
+                return
+            }
+
+            // Construct download URL
+            def url = "${soFilesConfig.baseUrl}/${soFilesConfig.version}/${arch}/${soFilesConfig.libraryName}"
+
+            println "⬇ Downloading ${soFilesConfig.libraryName} for ${arch}..."
+
+            try {
+                new URL(url).withInputStream { input ->
+                    outputFile.withOutputStream { output ->
+                        output << input
+                    }
+                }
+                println "✓ Downloaded ${soFilesConfig.libraryName} for ${arch}"
+            } catch (Exception e) {
+                println "✗ Failed to download ${soFilesConfig.libraryName} for ${arch}: ${e.message}"
+                // Optionally fail the build or continue
+                // throw new GradleException("Failed to download native libraries")
+            }
+        }
+    }
+}
+
+// Alternative: Using the download plugin (more robust)
+def downloadSoFilesWithPlugin = tasks.register('downloadSoFilesWithPlugin', Download) {
+    def jniLibsDir = new File(projectDir, 'src/main/jniLibs')
+
+    // Generate URLs for all architectures
+    def urls = soFilesConfig.architectures.collect { arch ->
+        "${soFilesConfig.baseUrl}/${soFilesConfig.version}/${arch}/${soFilesConfig.libraryName}"
+    }
+
+    src urls
+    dest jniLibsDir
+    overwrite false
+    onlyIfModified true
+
+    doFirst {
+        // Create architecture directories
+        soFilesConfig.architectures.each { arch ->
+            new File(jniLibsDir, arch).mkdirs()
+        }
+    }
+
+    doLast {
+        // Move files to correct architecture folders
+        soFilesConfig.architectures.each { arch ->
+            def sourceFile = new File(jniLibsDir, soFilesConfig.libraryName)
+            def destDir = new File(jniLibsDir, arch)
+            def destFile = new File(destDir, soFilesConfig.libraryName)
+
+            if (sourceFile.exists() && !destFile.exists()) {
+                sourceFile.renameTo(destFile)
+            }
+        }
+    }
+}
+
+// Hook into the build process
+tasks.whenTaskAdded { task ->
+    if (task.name == 'preBuild') {
+        task.dependsOn downloadSoFiles
+        // Or use: task.dependsOn downloadSoFilesWithPlugin
+    }
+}
 
 android {
     if (project.android.hasProperty("namespace")) {
@@ -46,5 +141,17 @@ android {
 
     defaultConfig {
         minSdkVersion 21
+
+        // Ensure native libraries are included
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+        }
+    }
+
+    // Specify where to find native libraries
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['src/main/jniLibs']
+        }
     }
 }
