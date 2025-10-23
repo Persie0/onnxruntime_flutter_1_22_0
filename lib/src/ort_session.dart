@@ -478,7 +478,7 @@ class OrtSession {
             .instance.ortApiPtr.ref.ModelMetadataLookupCustomMetadataMap
             .asFunction<
                 bg.OrtStatusPtr Function(
-                    ffi.Pointer<bg.OrtModelMetadata> model_metadata,
+                    ffi.Pointer<bg.OrtModelMetadata> modelMetadata,
                     ffi.Pointer<bg.OrtAllocator> allocator,
                     ffi.Pointer<ffi.Char> key,
                     ffi.Pointer<ffi.Pointer<ffi.Char>> value)>()(
