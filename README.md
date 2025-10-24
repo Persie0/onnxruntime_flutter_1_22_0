@@ -1,5 +1,18 @@
 <p align="center"><img width="50%" src="https://github.com/microsoft/onnxruntime/raw/main/docs/images/ONNX_Runtime_logo_dark.png" /></p>
 
+This is a **fork** of the original [onnxruntime Flutter plugin](https://github.com/gtbluesky/onnxruntime_flutter), which appears to be no longer maintained.
+**This fork adds support for 16KB memory page size.**
+**full GPU and hardware acceleration support**
+
+> **Note:** macOS is not supported on pub.dev due to their package size limit. If you need macOS support, use this package as a dependency via `git:` in your `pubspec.yaml`:
+>
+> ```yaml
+> dependencies:
+>   onnxruntime:
+>     git:
+>       url: https://github.com/Persie0/onnxruntime_flutter_1_22_0
+> ```
+
 # OnnxRuntime Plugin
 [![pub package](https://img.shields.io/pub/v/onnxruntime.svg)](https://pub.dev/packages/onnxruntime)
 
@@ -38,7 +51,7 @@ dependencies:
 ### Import
 
 ```dart
-import 'package:onnxruntime/onnxruntime.dart';
+import 'package:onnxruntime_v2/onnxruntime_v2.dart';
 ```
 
 ### Initializing environment

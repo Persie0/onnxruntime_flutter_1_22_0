@@ -4,15 +4,15 @@ import 'dart:typed_data';
 import 'package:flutter/services.dart';
 
 import 'package:ffi/ffi.dart';
-import 'package:onnxruntime/src/bindings/bindings.dart';
-import 'package:onnxruntime/src/bindings/onnxruntime_bindings_generated.dart'
+import 'package:onnxruntime_v2/src/bindings/bindings.dart';
+import 'package:onnxruntime_v2/src/bindings/onnxruntime_bindings_generated.dart'
     as bg;
-import 'package:onnxruntime/src/ort_env.dart';
-import 'package:onnxruntime/src/ort_isolate_session.dart';
-import 'package:onnxruntime/src/ort_status.dart';
-import 'package:onnxruntime/src/ort_value.dart';
-import 'package:onnxruntime/src/ort_provider.dart';
-import 'package:onnxruntime/src/providers/ort_flags.dart';
+import 'package:onnxruntime_v2/src/ort_env.dart';
+import 'package:onnxruntime_v2/src/ort_isolate_session.dart';
+import 'package:onnxruntime_v2/src/ort_status.dart';
+import 'package:onnxruntime_v2/src/ort_value.dart';
+import 'package:onnxruntime_v2/src/ort_provider.dart';
+import 'package:onnxruntime_v2/src/providers/ort_flags.dart';
 
 class OrtSession {
   late ffi.Pointer<bg.OrtSession> _ptr;
@@ -478,7 +478,7 @@ class OrtSession {
             .instance.ortApiPtr.ref.ModelMetadataLookupCustomMetadataMap
             .asFunction<
                 bg.OrtStatusPtr Function(
-                    ffi.Pointer<bg.OrtModelMetadata> model_metadata,
+                    ffi.Pointer<bg.OrtModelMetadata> modelMetadata,
                     ffi.Pointer<bg.OrtAllocator> allocator,
                     ffi.Pointer<ffi.Char> key,
                     ffi.Pointer<ffi.Pointer<ffi.Char>> value)>()(

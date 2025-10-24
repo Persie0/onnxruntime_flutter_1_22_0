@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:isolate';
 
-import 'package:onnxruntime/src/ort_session.dart';
-import 'package:onnxruntime/src/ort_value.dart';
+import 'package:onnxruntime_v2/src/ort_session.dart';
+import 'package:onnxruntime_v2/src/ort_value.dart';
 
 /// Isolate wrapper for OrtSession to enable non-blocking async inference.
 ///

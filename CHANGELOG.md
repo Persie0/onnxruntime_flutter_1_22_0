@@ -1,5 +1,15 @@
-## 1.22.0
+## 1.23.1
+* add libonnx 16kb compatible for x86 and x64
 
+## 1.23.0
+* full GPU and hardware acceleration support, results in speedups on compatible devices
+
+
+## 1.22.0+1
+* compile sdk upgraded
+
+## 1.22.0
+* 16Kb page size support for Android
 * Updated to ONNX Runtime 1.22.0
 * Added support for `setSessionExecutionMode` to control sequential/parallel execution
 * Added `OrtSessionExecutionMode` enum with `ortSequential` and `ortParallel` options
