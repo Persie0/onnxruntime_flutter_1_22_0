@@ -34,7 +34,7 @@ In your flutter project add the dependency:
 ```yml
 dependencies:
   ...
-  onnxruntime: x.y.z
+  onnxruntime_v2: x.y.z
 ```
 
 ## Usage example
