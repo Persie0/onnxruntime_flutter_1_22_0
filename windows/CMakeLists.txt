@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.14)
 
 # Project-level configuration.
-set(PROJECT_NAME "onnxruntime")
+set(PROJECT_NAME "onnxruntime_v2")
 project(${PROJECT_NAME} LANGUAGES CXX)
 
 # Invoke the build for native code shared with the other target platforms.
@@ -19,7 +19,7 @@ project(${PROJECT_NAME} LANGUAGES CXX)
 # Includes GPU provider DLLs for CUDA, TensorRT, and DirectML acceleration.
 # These DLLs are optional - if the GPU runtime is not available on the target
 # system, ONNX Runtime will gracefully fall back to CPU execution.
-set(onnxruntime_bundled_libraries
+set(onnxruntime_v2_bundled_libraries
   "${CMAKE_CURRENT_SOURCE_DIR}/onnxruntime.dll"
   PARENT_SCOPE
 )
