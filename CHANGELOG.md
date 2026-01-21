@@ -1,3 +1,7 @@
+## 1.23.2+2
+* Fixes Linux and Windows build issues
+* Updated dependencies
+
 ## 1.23.2+1
 * Fix iOS podspec issue
 
