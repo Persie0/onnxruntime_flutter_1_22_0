@@ -432,6 +432,56 @@ class OrtValueTensor extends OrtValue {
     return OrtValueTensor(ortValuePtr, dataPtr);
   }
 
+  static OrtValueTensor createTensorWithFloat16DataList(List data,
+      [List<int>? shape]) {
+    shape ??= data.shape;
+    var dataType = ONNXTensorElementDataType.float16;
+    ffi.Pointer<ffi.Void> dataPtr = ffi.nullptr;
+    
+    final flattenData = data.flatten<int>();
+    int dataSize = flattenData.length;
+    dataPtr = (calloc<ffi.Uint16>(dataSize)
+          ..asTypedList(dataSize).setRange(0, dataSize, flattenData))
+        .cast();
+    int dataByteCount = dataSize * 2;
+
+    final shapeSize = shape.length;
+    final shapePtr = calloc<ffi.Int64>(shapeSize);
+    shapePtr.asTypedList(shapeSize).setRange(0, shapeSize, shape);
+
+    final ortMemoryInfoPtrPtr = calloc<ffi.Pointer<bg.OrtMemoryInfo>>();
+    var statusPtr = OrtEnv.instance.ortApiPtr.ref.AllocatorGetInfo.asFunction<
+            bg.OrtStatusPtr Function(ffi.Pointer<bg.OrtAllocator>,
+                ffi.Pointer<ffi.Pointer<bg.OrtMemoryInfo>>)>()(
+        OrtAllocator.instance.ptr, ortMemoryInfoPtrPtr);
+    OrtStatus.checkOrtStatus(statusPtr);
+    final ortMemoryInfoPtr = ortMemoryInfoPtrPtr.value;
+    final ortValuePtrPtr = calloc<ffi.Pointer<bg.OrtValue>>();
+    statusPtr = OrtEnv.instance.ortApiPtr.ref.CreateTensorWithDataAsOrtValue
+            .asFunction<
+                bg.OrtStatusPtr Function(
+                    ffi.Pointer<bg.OrtMemoryInfo>,
+                    ffi.Pointer<ffi.Void>,
+                    int,
+                    ffi.Pointer<ffi.Int64>,
+                    int,
+                    int,
+                    ffi.Pointer<ffi.Pointer<bg.OrtValue>>)>()(
+        ortMemoryInfoPtr,
+        dataPtr,
+        dataByteCount,
+        shapePtr,
+        shapeSize,
+        dataType.value,
+        ortValuePtrPtr);
+    OrtStatus.checkOrtStatus(statusPtr);
+    final ortValuePtr = ortValuePtrPtr.value;
+    calloc.free(shapePtr);
+    calloc.free(ortValuePtrPtr);
+    calloc.free(ortMemoryInfoPtrPtr);
+    return OrtValueTensor(ortValuePtr, dataPtr);
+  }
+
   @override
   dynamic get value {
     if (_info._dimensionsCount == 0) {

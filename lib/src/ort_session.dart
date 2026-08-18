@@ -37,16 +37,23 @@ class OrtSession {
   /// Creates a session from a file.
   OrtSession.fromFile(File modelFile, OrtSessionOptions options) {
     final pp = calloc<ffi.Pointer<bg.OrtSession>>();
+    final ffi.Pointer<ffi.Char> pathPtr;
+    if (Platform.isWindows) {
+      pathPtr = modelFile.path.toNativeUtf16().cast<ffi.Char>();
+    } else {
+      pathPtr = modelFile.path.toNativeUtf8().cast<ffi.Char>();
+    }
     final statusPtr = OrtEnv.instance.ortApiPtr.ref.CreateSession.asFunction<
             bg.OrtStatusPtr Function(
                 ffi.Pointer<bg.OrtEnv>,
                 ffi.Pointer<ffi.Char>,
                 ffi.Pointer<bg.OrtSessionOptions>,
                 ffi.Pointer<ffi.Pointer<bg.OrtSession>>)>()(OrtEnv.instance.ptr,
-        modelFile.path.toNativeUtf8().cast<ffi.Char>(), options._ptr, pp);
+        pathPtr, options._ptr, pp);
     OrtStatus.checkOrtStatus(statusPtr);
     _ptr = pp.value;
     calloc.free(pp);
+    calloc.free(pathPtr);
     _init();
   }
 
