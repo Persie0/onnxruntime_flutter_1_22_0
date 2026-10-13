@@ -506,6 +506,8 @@ class OrtSessionOptions {
   late ffi.Pointer<bg.OrtSessionOptions> _ptr;
   int _intraOpNumThreads = 0;
 
+  int get address => _ptr.address;
+
   OrtSessionOptions() {
     _create();
   }
